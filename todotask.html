@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-Do App</title>
+<style>
+    table {
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    input[type="text"] {
+        padding: 8px;
+        width: 200px;
+    }
+
+    button {
+        padding: 8px;
+    }
+
+    .error {
+        color: red;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<h2>To Do Task 🖊️️</h2>
+
+<input type="text" id="taskInput" placeholder="Enter task">
+<button onclick="addTask()">Add Task</button>
+<div id="error" class="error">"Task name cannot be empty."</div>
+
+<table id="taskTable">
+    <tr>
+      
+    </tr>
+</table>
+
+<script>
+
+  //Array for store task
+    let tasks = [];
+
+    //Add Task
+    function addTask() {
+        const taskInput = document.getElementById("taskInput");
+        const errorDiv = document.getElementById("error");
+        const taskName = taskInput.value;
+       
+       // check add tasks inputs are empty.
+        if (taskName === "") {
+           errorDiv.style.display="block"
+           
+           //remove error message after 3 seconds
+           setTimeout(function() {
+             errorDiv.style.display="none"
+           }, 3000);
+            return;
+        }
+
+        const newTask = { name: taskName };
+        tasks.push(newTask);
+        
+        //render the new tasks.
+        renderTasks();
+        
+        //empty the values in task input.
+        taskInput.value = "";
+    }
+    
+    //Delete task
+    function deleteTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
+    }
+
+   //edit Task
+    function editTask(index) {
+        const taskRow = document.getElementById(`taskRow_${index}`);
+        const taskName = tasks[index].name;
+        taskRow.innerHTML = `
+            <td><input type="text" id="editTaskInput_${index}" value="${taskName}"></td>
+            <td>
+                <button onclick="updateTask(${index})">Update</button>
+                <button onclick="cancelEdit(${index}, '${taskName}')">Cancel</button>
+            </td>
+        `;
+    }
+    
+    //Update Task
+    function updateTask(index) {
+        const editedTaskName = document.getElementById(`editTaskInput_${index}`).value;
+        const errorDiv = document.getElementById("error");
+       
+       //check inputs are empty
+        if (editedTaskName === "") {
+            errorDiv.style.display="block"
+            
+            //remove error message after 3 seconds
+             setTimeout(function() {
+             errorDiv.style.display="none"
+           }, 3000);
+            return;
+        }
+
+        tasks[index].name = editedTaskName;
+        renderTasks();
+    }
+    // cancel Edit
+    function cancelEdit(index, taskName) {
+      
+      //assign existing task name, when cancel the edit.
+        tasks[index].name = taskName;
+        renderTasks();
+    }
+    
+    //when new task updated,Append the tasks in the table.
+    function renderTasks() {
+        const taskTable = document.getElementById("taskTable");
+        taskTable.innerHTML = `
+            <tr>
+                <th>Task</th>
+                <th>Action</th>
+            </tr>
+        `;
+
+        tasks.forEach((task, index) => {
+            const row = document.createElement("tr");
+            row.id = `taskRow_${index}`;
+            row.innerHTML = `
+                <td>${task.name}</td>
+                <td>
+                    <button onclick="editTask(${index})">Edit</button>
+                    <button onclick="deleteTask(${index})">Delete</button>
+                </td>
+            `;
+            
+          //append the row in table.
+            taskTable.appendChild(row);
+        });
+    }
+</script>
+
+</body>
+</html>
